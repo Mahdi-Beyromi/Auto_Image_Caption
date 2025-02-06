@@ -45,7 +45,7 @@ import pickle
 CAPTION_FILE = "C:\\Users\\ariyan\\AI\\Flickr8k.token.txt"
 
 def load_captions(filename):
-    """Load captions from file and store only one caption per image"""
+    """Load captions from file and store all 5 captions per image"""
     captions_dict = {}
     with open(filename, 'r') as file:
         for line in file:
@@ -54,18 +54,14 @@ def load_captions(filename):
                 continue
             image_id, caption = parts[0].split("#")[0], parts[1]
 
-            # اگر این تصویر قبلاً کپشن گرفته، از پردازش رد می‌شیم
-            if image_id in captions_dict:
-                continue
+            # اگر این تصویر قبلاً اضافه نشده، یک لیست جدید برایش بساز
+            if image_id not in captions_dict:
+                captions_dict[image_id] = []
 
-            cleaned_caption = preprocess_caption(caption)
-            if len(cleaned_caption.split()) < 2:  # اگر کپشن خیلی کوتاهه، ردش کنیم
-                print(f"⚠ Skipping short caption: {cleaned_caption}")
-                continue
-
-            captions_dict[image_id] = cleaned_caption  # ذخیره فقط یک کپشن
+            captions_dict[image_id].append(preprocess_caption(caption))  # اضافه کردن همه‌ی کپشن‌ها
 
     return captions_dict
+
 
 def preprocess_caption(caption):
     """Convert captions to lowercase, remove punctuation, and clean text"""
